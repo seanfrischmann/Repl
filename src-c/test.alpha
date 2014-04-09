@@ -1,0 +1,18 @@
+eq { equal } bind pop
+lt { lessThan } bind pop
+gt { b exc bind pop c exc bind b lessThan not c b equal not and } bind pop
+le { b exc bind pop c exc bind b lessThan c b equal or } bind pop
+ge { b exc bind pop c exc bind b lessThan not c b equal or } bind pop
+
+fact0 { pop pop 1 1 } bind pop
+fact { n exc bind n 1 sub fact0 fact n 0 equal if apply mul } bind pop
+
+fib1 { pop pop pop pop } bind pop
+fib0 { limit exc bind pop n1 exc bind exc n1 add n1 exc limit fib1 fib0 n1 limit lessThan not if apply } bind pop
+fib { 0 exc 1 exc fib0 apply } bind pop
+
+prime3 { pop 2 equal } bind pop
+prime2 { divr exc bind pop divd exc bind pop divd divr 2 add prime3 prime0 divd divr rem 0 equal if apply } bind pop
+prime1 { pop 1 equal not } bind pop
+prime0 { divr exc bind pop divd exc bind pop divd divr prime1 prime2 divd divr div divr lessThan if apply } bind pop
+prime { divd exc bind 3 prime3 prime0 divd 2 rem 0 equal if apply } bind pop
