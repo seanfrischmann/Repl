@@ -58,7 +58,6 @@ char * expression2string(struct Expr * t){
     break;
   case NUMBER: {
       int v = valueOf(t);
-      printf("e2s: %d\n",v);
       int number_of_characters = v==0? 1 : (int) floor(log10(abs(v)));
       if (valueOf(t) < 0) { number_of_characters++; }
       str = (char *) malloc(sizeof(char)*number_of_characters);
