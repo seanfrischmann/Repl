@@ -10,10 +10,6 @@ import bind
 
 def parse(user_input, env):
 	position = 0
-	while position < len(user_input):
-		if user_input[position] == '\n':
-			user_input[position].replace('\n','')
-		position = position+1
 	isError = False
 	isPrimitive = False
 	isNegative = False

@@ -25,11 +25,12 @@ def load(inputFile):
 	return buf
 
 def repl():
-	print('\nInterpreter\n'
-			'Author: Sean Frischmann\n'
-			'Class: Cse 305\n'
-			'Incomplete Features:\n'
-			'    functions and apply\n')
+	print
+	(
+		'\nInterpreter\n'
+		'Author: Sean Frischmann\n'
+		'Class: Cse 305\n'
+	)
 	env = dict()
 	env['stack'] = list()
 	env['bindings'] = dict()
@@ -74,7 +75,7 @@ def repl():
 						env['stack'].pop(0)
 					else:
 						buf = ':error:' + buf[position+1:len(buf)]
-					user_input = ""
+					user_input = ''
 					position = 0
 					continue
 				elif user_input == 'load':
@@ -92,6 +93,8 @@ def repl():
 						except:
 							user_input = ':error:'
 							continue
+				elif (isString):
+					user_input = user_input + '\n'
 				elif (not isString) and (not isClosure):
 					parser.parse(user_input,env)
 					user_input = ''
@@ -133,12 +136,7 @@ def repl():
 				user_input = ''
 			position = position+1
 		if isPrompt:
-			print "STACK:"
 			print_list(env['stack'])
-			print "BINDINGS:"
-			print_list(env['bindings'])
-			print "CLOSURES:"
-			print_list(env['closures'])
 
 
 repl()
