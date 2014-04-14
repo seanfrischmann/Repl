@@ -6,7 +6,8 @@
 # Class: Cse 305
 # ===========================================================================
 import sys
-import parser
+import evaluater
+import closure
 
 def print_list(stack):
 	for i, v in enumerate(stack):
@@ -25,8 +26,7 @@ def load(inputFile):
 	return buf
 
 def repl():
-	print
-	(
+	print (
 		'\nInterpreter\n'
 		'Author: Sean Frischmann\n'
 		'Class: Cse 305\n'
@@ -36,34 +36,31 @@ def repl():
 	env['bindings'] = dict()
 	env['closures'] = list()
 	env['binded closures'] = dict()
-	isPrompt = True
-	isSpace = False
-	isString = False
-	isClosure = False
-	isFile = False
-	user_input = ''
+	mode = 'default'
 	buf = ''
+	isSpace = False
+	closure_count = 0
+	user_input = ''
 	while True:
-		if isPrompt:
+		if mode == 'default':
 			buf = raw_input('repl> ')
-		elif not isFile:
+		else:
 			buf = raw_input(' ')
-		elif isFile:
-			isFile = False
-			isPrompt = True
 		position=0
 		while position < len(buf):
 			if buf[position] == '"':
-				if isString == True:
-					isPrompt = True
-					isString = False
+				if mode == 'closure':
+					mode = 'closure-string'
+				elif mode == 'closure-string':
+					mode = 'closure'
+				elif mode == 'string':
+					mode = 'default'
 				else:
-					isString = True
-					isPrompt = False
+					mode = 'string'
 			if buf[position] == '{':
-					isPrompt = False
-					isClosure = True
-			if (buf[position] == ' ') and (not isString) and (not isClosure):
+				closure_count = closure_count + 1
+				mode = 'closure'
+			if (buf[position] == ' ') and (mode == 'default'):
 				isSpace = True
 			else:
 				user_input = user_input + buf[position]
@@ -86,56 +83,52 @@ def repl():
 							buf = buf[position:len(buf)]
 							buf = load(inputFile)+' '+':true:'+buf
 							env['stack'].pop(0)
-							isFile = True
-							isPrompt = False
 							user_input = ''
-							break;
-						except:
-							user_input = ':error:'
+							position = 0
 							continue
-				elif (isString):
+						except:
+							user_input = ':false:'
+							continue
+				elif mode == 'string':
 					user_input = user_input + '\n'
-				elif (not isString) and (not isClosure):
-					parser.parse(user_input,env)
+				elif mode == 'default':
+					evaluater.evaluate(user_input,env)
 					user_input = ''
 					isSpace = False
-			if buf[position] == '}' and (isClosure):
-				isFrontValid = True
-				isEndValid = True
-				isMore = True
-				if user_input[1] != ' ':
-					isFrontValid = False
-					temp = ':error:'+user_input[2:len(user_input)]
-					user_input = temp
-				if user_input[len(user_input)-2] != ' ':
-					isEndValid = False
-					if isFrontValid:
-						temp = ':error:'+user_input[1:len(user_input)]
+			if buf[position] == '}' and mode == 'closure':
+				closure_count = closure_count - 1
+				if closure_count == 0:
+					isFrontValid = True
+					isEndValid = True
+					isMore = True
+					if user_input[1] != ' ':
+						isFrontValid = False
+						temp = ':error:'+user_input[2:len(user_input)]
 						user_input = temp
-				if (position+1) < len(buf):
-					if buf[position+1] != ' ':
+					if user_input[len(user_input)-2] != ' ':
+						isEndValid = False
 						if isFrontValid:
-							isFrontValid = False
 							temp = ':error:'+user_input[1:len(user_input)]
 							user_input = temp
+					if (position+1) < len(buf):
+						if buf[position+1] != ' ':
+							if isFrontValid:
+								isFrontValid = False
+								temp = ':error:'+user_input[1:len(user_input)]
+								user_input = temp
+						else:
+							isMore = True
+					if isFrontValid and isEndValid:
+						closure.createClosure(user_input, env)
+						if isMore:
+							position = position+1
 					else:
-						isMore = True
-				if isFrontValid and isEndValid:
-					user_input = user_input.replace('{','')
-					user_input = user_input.replace('}','')
-					user_input = user_input[1:len(user_input)-1]
-					env['closures'].insert(0,user_input)
-					env['stack'].insert(0,':closure:')
-					if isMore:
-						position = position+1
-				else:
-					buf = user_input + buf[position+1:len(buf)]
-					position = -1
-				isPrompt = True
-				isClosure = False
-				user_input = ''
+						buf = user_input + buf[position+1:len(buf)]
+						position = -1
+					mode = 'default'
+					user_input = ''
 			position = position+1
-		if isPrompt:
+		if mode == 'default':
 			print_list(env['stack'])
 
 

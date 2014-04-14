@@ -1,6 +1,6 @@
 # ===========================================================================
-# +++parser.py+++|
-# _______________|
+# +++evaluater.py+++|
+# __________________|
 #
 # Author: Sean Frischmann
 # Class: Cse 305
@@ -8,7 +8,7 @@
 import sys
 import bind
 
-def parse(user_input, env):
+def evaluate(user_input, env):
 	position = 0
 	isError = False
 	isPrimitive = False
