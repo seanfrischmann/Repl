@@ -9,5 +9,5 @@ import sys
 
 def createClosure(user_input, env):
 	user_input = user_input[2:len(user_input)-2]
-	env['closures'].insert(0,user_input)
+	env['global']['closures'].insert(0,user_input)
 	env['stack'].insert(0,':closure:')

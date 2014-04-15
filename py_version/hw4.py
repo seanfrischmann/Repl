@@ -33,12 +33,16 @@ def repl():
 	)
 	env = dict()
 	env['stack'] = list()
-	env['bindings'] = dict()
-	env['closures'] = list()
-	env['binded closures'] = dict()
+	env['global'] = dict()
+	env['active'] = list()
+	env['global']['bindings'] = dict()
+	env['global']['closures'] = list()
+	env['global']['binded closures'] = dict()
+	env['inactive links'] = dict()
 	mode = 'default'
 	buf = ''
 	isSpace = False
+	active_env = 0
 	closure_count = 0
 	user_input = ''
 	while True:
@@ -67,9 +71,13 @@ def repl():
 			if isSpace or position == len(buf)-1:
 				if user_input == 'apply':
 					if env['stack'][0] == ':closure:':
-						buf = env['closures'][0] + buf[position+1:len(buf)]
-						env['closures'].pop(0)
+						buf = env['global']['closures'][0] + buf[position+1:len(buf)]
+						env['global']['closures'].pop(0)
 						env['stack'].pop(0)
+						active_env += 1
+						env['active'].insert(0,{})
+						env['active'][0]['bindings'] = dict()
+						env['active'][0]['binded closures'] = dict()
 					else:
 						buf = ':error:' + buf[position+1:len(buf)]
 					user_input = ''
@@ -92,7 +100,7 @@ def repl():
 				elif mode == 'string':
 					user_input = user_input + '\n'
 				elif mode == 'default':
-					evaluater.evaluate(user_input,env)
+					evaluater.evaluate(user_input,env, active_env)
 					user_input = ''
 					isSpace = False
 			if buf[position] == '}' and mode == 'closure':

@@ -8,7 +8,7 @@
 import sys
 import bind
 
-def evaluate(user_input, env):
+def evaluate(user_input, env, active_env):
 	position = 0
 	isError = False
 	isPrimitive = False
@@ -41,7 +41,7 @@ def evaluate(user_input, env):
 			else:
 				isError = True
 		elif user_input == 'bind':
-			if not bind.bindFunc(user_input, env):
+			if not bind.bindFunc(user_input, env, active_env):
 				isError = True
 		elif user_input == ':true:' or user_input == ':false:':
 			isInsert = True
@@ -79,7 +79,7 @@ def evaluate(user_input, env):
 			user_input = ''
 		elif user_input == 'pop':
 			if env['stack'][0] == ':closure:':
-				env['closures'].pop(0)
+				env['global']['closures'].pop(0)
 			env['stack'].pop(0)
 			user_input = ''
 		elif user_input == 'exc':
@@ -88,11 +88,7 @@ def evaluate(user_input, env):
 			env['stack'].insert(0 , temp)
 			user_input = ''
 		elif user_input[0].isalpha():
-			while (env['bindings']).has_key(user_input):
-				temp = env['bindings'][user_input]
-				if temp == ':closure:':
-					env['closures'].insert(0,env['binded closures'][user_input])
-				user_input = temp
+			user_input = bind.evalName(user_input, env, active_env)
 			isInsert = True
 		else:
 			isError = True
