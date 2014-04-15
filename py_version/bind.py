@@ -36,7 +36,7 @@ def bindFunc(user_input, env, active_env):
 	else:
 		not_local = env['stack'][0]
 	if active_env == 0:
-		if env['global']['bindings'].has_key(local):
+		if (local) in env['global']['bindings']:
 			return False
 		else:
 			if not_local == ':closure:':
@@ -47,7 +47,7 @@ def bindFunc(user_input, env, active_env):
 			env['stack'].pop(1)
 			return True
 	else:
-		if env['active'][0]['bindings'].has_key(local):
+		if (local) in env['active'][0]['bindings']:
 			return False
 		else:
 			if not_local == ':closure:':
@@ -63,20 +63,20 @@ def evalName(user_input, env, active_env):
 	local = user_input
 	not_local = None
 	i = 1
-	if (active_env > 0) and (env['active'][0]['bindings'].has_key(user_input)):
+	if (active_env > 0) and ((user_input) in env['active'][0]['bindings']):
 		local = env['active'][0]['bindings'][user_input]
 		not_local = env['active'][0]['bindings'][user_input]
 		if not_local == ':closure:':
 			env['global']['closures'].insert(0,env['active'][i]['binded closures'][user_input])
 		i = active_env
 	while i < active_env:
-		if env['active'][i]['bindings'].has_key(user_input):
+		if (user_input) in env['active'][i]['bindings']:
 			not_local = env['active'][i]['bindings'][user_input]
 			if not_local == ':closure:':
 				env['global']['closures'].insert(0,env['active'][i]['binded closures'][user_input])
 		i += 1
 	if not_local  == None:
-		if env['global']['bindings'].has_key(user_input):
+		if (user_input) in env['global']['bindings']:
 			not_local = env['global']['bindings'][user_input]
 			if active_env == 0:
 				local = env['global']['bindings'][user_input]

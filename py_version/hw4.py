@@ -11,7 +11,7 @@ import closure
 
 def print_list(stack):
 	for i, v in enumerate(stack):
-		print v
+		print (v)
 
 def load(inputFile):
 	buf = ''
@@ -42,15 +42,27 @@ def repl():
 	mode = 'default'
 	buf = ''
 	isSpace = False
+	apply_count = 0
+	temp_buf = []
+	temp_position = []
 	active_env = 0
 	closure_count = 0
 	user_input = ''
 	while True:
-		if mode == 'default':
-			buf = raw_input('repl> ')
-		else:
-			buf = raw_input(' ')
 		position=0
+		if apply_count > 0:
+			buf = temp_buf[0]
+			temp_buf.pop(0)
+			position = temp_position[0]
+			temp_position.pop(0)
+			position += 1
+			apply_count += -1
+			active_env += -1
+			env['active'].pop(0)
+		elif mode == 'default':
+			buf = input('repl> ')
+		else:
+			buf = input(' ')
 		while position < len(buf):
 			if buf[position] == '"':
 				if mode == 'closure':
@@ -71,7 +83,9 @@ def repl():
 			if isSpace or position == len(buf)-1:
 				if user_input == 'apply':
 					if env['stack'][0] == ':closure:':
-						buf = env['global']['closures'][0] + buf[position+1:len(buf)]
+						temp_buf.insert(0, buf)
+						temp_position.insert(0, position)
+						buf = env['global']['closures'][0]
 						env['global']['closures'].pop(0)
 						env['stack'].pop(0)
 						active_env += 1
@@ -81,6 +95,8 @@ def repl():
 					else:
 						buf = ':error:' + buf[position+1:len(buf)]
 					user_input = ''
+					apply_count += 1
+					isSpace = False
 					position = 0
 					continue
 				elif user_input == 'load':
@@ -136,7 +152,7 @@ def repl():
 					mode = 'default'
 					user_input = ''
 			position = position+1
-		if mode == 'default':
+		if mode == 'default' and (apply_count == 0):
 			print_list(env['stack'])
 
 
