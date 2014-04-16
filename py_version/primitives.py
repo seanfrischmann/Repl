@@ -55,3 +55,55 @@ def add_func(env):
 		bottomValue = get_not_local(bottomValue)
 	return int(topValue) + int(bottomValue)
 
+def sub_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	return int(bottomValue) - int(topValue)
+
+def div_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	temp = 0
+	temp = int(bottomValue) // int(topValue)
+	if int(bottomValue) < 0 and int(topValue) < 0:
+		temp = temp + 1
+	return temp
+
+def rem_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	temp = 0
+	if int(bottomValue) < 0 and int(topValue) < 0:
+		temp2 = int(bottomValue) // int(topValue)
+		temp2 = temp2 + 1
+		temp = int(bottomValue) - (temp2*int(topValue))
+	else:
+		temp = int(bottomValue) % int(topValue)
+	return temp
+
+def mul_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	return int(bottomValue) * int(topValue)
+
+def neg_func(env):
+	topValue = env['stack'][0]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	return int(topValue) * int(-1)

@@ -5,6 +5,7 @@
 # Author: Sean Frischmann
 # Class: Cse 305
 # ===========================================================================
+import primitives
 
 
 def bindFunc(user_input, env, active_env):
@@ -22,17 +23,7 @@ def bindFunc(user_input, env, active_env):
 	else:
 		return False
 	if (env['stack'][0])[0] == '<': 
-		start_building = False
-		i = 1
-		while i < len(env['stack'][1]):
-			if env['stack'][0][i] == '>':
-				break
-			if env['stack'][0][i] == ',':
-				start_building = True
-				i += 1
-			if start_building:
-				not_local = not_local + env['stack'][0][i]
-			i += 1
+		not_local = primitives.get_not_local(env['stack'][0])
 	else:
 		not_local = env['stack'][0]
 	if active_env == 0:
@@ -59,26 +50,32 @@ def bindFunc(user_input, env, active_env):
 			return True
 
 
-def evalName(user_input, env, active_env):
+def evalName(user_input, env, isNested):
 	local = user_input
 	not_local = None
+	current_env = ''
+	if isNested:
+		current_env = 'inactive'
+	else:
+		current_env = 'active'
 	i = 1
-	if (active_env > 0) and ((user_input) in env['active'][0]['bindings']):
-		local = env['active'][0]['bindings'][user_input]
-		not_local = env['active'][0]['bindings'][user_input]
+	env_len = len(env[current_env])
+	if (env_len > 0) and ((user_input) in env[current_env][0]['bindings']):
+		local = env[current_env][0]['bindings'][user_input]
+		not_local = env[current_env][0]['bindings'][user_input]
 		if not_local == ':closure:':
-			env['global']['closures'].insert(0,env['active'][i]['binded closures'][user_input])
-		i = active_env
-	while i < active_env:
-		if (user_input) in env['active'][i]['bindings']:
-			not_local = env['active'][i]['bindings'][user_input]
+			env['global']['closures'].insert(0,env[current_env][i]['binded closures'][user_input])
+		i = env_len
+	while i < env_len:
+		if (user_input) in env[current_env][i]['bindings']:
+			not_local = env[current_env][i]['bindings'][user_input]
 			if not_local == ':closure:':
-				env['global']['closures'].insert(0,env['active'][i]['binded closures'][user_input])
+				env['global']['closures'].insert(0,env[current_env][i]['binded closures'][user_input])
 		i += 1
 	if not_local  == None:
 		if (user_input) in env['global']['bindings']:
 			not_local = env['global']['bindings'][user_input]
-			if active_env == 0:
+			if env_len == 0:
 				local = env['global']['bindings'][user_input]
 			if not_local == ':closure:':
 				env['global']['closures'].insert(0,env['global']['binded closures'][user_input])

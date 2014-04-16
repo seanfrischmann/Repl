@@ -38,10 +38,11 @@ def repl():
 	env['global']['bindings'] = dict()
 	env['global']['closures'] = list()
 	env['global']['binded closures'] = dict()
-	env['inactive links'] = dict()
+	env['inactive links'] = list()
 	mode = 'default'
 	buf = ''
 	isSpace = False
+	isNested = False
 	apply_count = 0
 	temp_buf = []
 	temp_position = []
@@ -51,6 +52,9 @@ def repl():
 	while True:
 		position=0
 		if apply_count > 0:
+			if isNested:
+				isNested = False
+				env['inactive links'] = list()
 			buf = temp_buf[0]
 			temp_buf.pop(0)
 			position = temp_position[0]
@@ -85,13 +89,23 @@ def repl():
 					if env['stack'][0] == ':closure:':
 						temp_buf.insert(0, buf)
 						temp_position.insert(0, position)
-						buf = env['global']['closures'][0]
-						env['global']['closures'].pop(0)
-						env['stack'].pop(0)
-						active_env += 1
+						closureValue = env['global']['closures'][0]
 						env['active'].insert(0,{})
 						env['active'][0]['bindings'] = dict()
 						env['active'][0]['binded closures'] = dict()
+						if isinstance(closureValue, dict):
+							isNested = True
+							linked_env = []
+							for val in closureValue.values():
+								linked_env = linked_env + val
+							env['inactive'] = linked_env
+							env['inactive'].insert(0,env['active'][0])
+							for val in closureValue.keys():
+								closureValue = val
+						buf = closureValue
+						env['global']['closures'].pop(0)
+						env['stack'].pop(0)
+						active_env += 1
 					else:
 						buf = ':error:' + buf[position+1:len(buf)]
 					user_input = ''
@@ -116,7 +130,7 @@ def repl():
 				elif mode == 'string':
 					user_input = user_input + '\n'
 				elif mode == 'default':
-					evaluater.evaluate(user_input,env, active_env)
+					evaluater.evaluate(user_input,env, active_env, isNested)
 					user_input = ''
 					isSpace = False
 			if buf[position] == '}' and mode == 'closure':
@@ -143,7 +157,7 @@ def repl():
 						else:
 							isMore = True
 					if isFrontValid and isEndValid:
-						closure.createClosure(user_input, env)
+						closure.createClosure(user_input, env, active_env)
 						if isMore:
 							position = position+1
 					else:

@@ -9,7 +9,7 @@ import sys
 import bind
 import primitives
 
-def evaluate(user_input, env, active_env):
+def evaluate(user_input, env, active_env, isNested):
 	position = 0
 	isError = False
 	isPrimitive = False
@@ -46,34 +46,28 @@ def evaluate(user_input, env, active_env):
 			temp = primitives.add_func(env)
 			isPrimitive = True
 		elif user_input == 'sub':
-			temp = int(env['stack'][1]) - int(env['stack'][0])
+			temp = primitives.sub_func(env)
 			isPrimitive = True
 		elif user_input == 'div':
-			if int(env['stack'][1]) < 0 and int(env['stack'][0]) < 0:
-				temp = int(env['stack'][1]) / int(env['stack'][0])
-				temp = temp + 1
-			else:
-				temp = int(env['stack'][1]) / int(env['stack'][0])
+			temp = primitives.div_func(env)
 			isPrimitive = True
 		elif user_input == 'rem':
-			if int(env['stack'][1]) < 0 and int(env['stack'][0]) < 0:
-				temp2 = int(env['stack'][1]) / int(env['stack'][0])
-				temp2 = temp2 + 1
-				temp = int(env['stack'][1]) - (temp2*int(env['stack'][0]))
-			else:
-				temp = int(env['stack'][1]) % int(env['stack'][0])
+			temp = primitives.rem_func(env)
 			isPrimitive = True
 		elif user_input == 'mul':
-			temp = int(env['stack'][1]) * int(env['stack'][0])
+			temp = primitives.mul_func(env)
 			isPrimitive = True
 		elif user_input == 'neg':
-			temp = int(env['stack'][0]) * int(-1)
+			temp = primitives.neg_func(env)
 			env['stack'].pop(0)
 			temp = str(temp)
 			env['stack'].insert(0, temp)
 			user_input = ''
 		elif user_input == 'pop':
-			if env['stack'][0] == ':closure:':
+			topValue = env['stack'][0]
+			if topValue[0] == '<':
+				topValue = primitives.get_not_local(topValue)
+			if topValue == ':closure:':
 				env['global']['closures'].pop(0)
 			env['stack'].pop(0)
 			user_input = ''
@@ -83,7 +77,7 @@ def evaluate(user_input, env, active_env):
 			env['stack'].insert(0 , temp)
 			user_input = ''
 		elif user_input[0].isalpha():
-			user_input = bind.evalName(user_input, env, active_env)
+			user_input = bind.evalName(user_input, env, isNested)
 			isInsert = True
 		else:
 			isError = True
