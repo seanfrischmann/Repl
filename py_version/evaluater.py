@@ -7,6 +7,7 @@
 # ===========================================================================
 import sys
 import bind
+import primitives
 
 def evaluate(user_input, env, active_env):
 	position = 0
@@ -32,13 +33,7 @@ def evaluate(user_input, env, active_env):
 		elif user_input[0] == '"':
 			isInsert = True
 		elif user_input == 'if':
-			if len(env['stack']) >= 3 and (env['stack'][0] == ':true:' or env['stack'][0] == ':false:'):
-				if env['stack'][0] == ':true:':
-					env['stack'].pop(1)
-				else:
-					env['stack'].pop(2)
-				env['stack'].pop(0)
-			else:
+			if not primitives.if_func(env):
 				isError = True
 		elif user_input == 'bind':
 			if not bind.bindFunc(user_input, env, active_env):
@@ -48,7 +43,7 @@ def evaluate(user_input, env, active_env):
 		elif user_input == ':error:':
 			isError = True
 		elif user_input == 'add':
-			temp = int(env['stack'][1]) + int(env['stack'][0])
+			temp = primitives.add_func(env)
 			isPrimitive = True
 		elif user_input == 'sub':
 			temp = int(env['stack'][1]) - int(env['stack'][0])
