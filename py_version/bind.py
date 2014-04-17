@@ -14,12 +14,9 @@ def bindFunc(user_input, env, active_env):
 	if (env['stack'][1])[0].isalpha(): 
 		local = env['stack'][1]
 	elif (env['stack'][1])[0] == '<': 
-		i = 1
-		while i < len(env['stack'][1]):
-			if env['stack'][1][i] == ',':
-				break
-			local = local + env['stack'][1][i]
-			i += 1
+		local = primitives.get_local(env['stack'][1])
+		if not local.isalpha():
+			return False
 	else:
 		return False
 	if (env['stack'][0])[0] == '<': 
@@ -36,6 +33,8 @@ def bindFunc(user_input, env, active_env):
 			else:
 				(env['global']['bindings'])[local] = not_local
 			env['stack'].pop(1)
+			env['stack'].pop(0)
+			env['stack'].insert(0, not_local)
 			return True
 	else:
 		if (local) in env['active'][0]['bindings']:
@@ -47,6 +46,8 @@ def bindFunc(user_input, env, active_env):
 			else:
 				(env['active'][0]['bindings'])[local] = not_local
 			env['stack'].pop(1)
+			env['stack'].pop(0)
+			env['stack'].insert(0, not_local)
 			return True
 
 

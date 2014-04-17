@@ -37,6 +37,18 @@ def evaluate(user_input, env, active_env, isNested):
 	elif user_input == 'bind':
 		if not bind.bindFunc(user_input, env, active_env):
 			isError = True
+	elif user_input == 'concat':
+		if not primitives.cat_func(env):
+			isError = True
+	elif user_input == 'length':
+		if not primitives.len_func(env):
+			isError = True
+	elif user_input == 'equal':
+		if primitives.equal_func(env):
+			user_input = ':true:'
+		else:
+			user_input = ':false:'
+		isInsert = True
 	elif user_input == ':true:' or user_input == ':false:':
 		isInsert = True
 	elif user_input == ':error:':

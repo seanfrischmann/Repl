@@ -7,6 +7,22 @@
 # ===========================================================================
 import sys
 
+def get_local(value):
+	local = ''
+	i = 1
+	isString = False
+	while i < len(value):
+		if value[i] == '"':
+			if isString:
+				isString = False
+			else:
+				isString = True
+		if value[i] == ',' and (not isString):
+			break
+		local = local + value[i]
+		i += 1
+	return local
+
 def get_not_local(value):
 	ret = ''
 	i = 1
@@ -107,3 +123,61 @@ def neg_func(env):
 	if topValue[0] == '<':
 		topValue = get_not_local(topValue)
 	return int(topValue) * int(-1)
+
+def equal_func(env):
+	topValue = env['stack'][0]
+	topLocal = ''
+	topNot = ''
+	bottomValue = env['stack'][1]
+	bottomLocal = ''
+	bottomNot = ''
+	isBinding = False
+	if topValue[0] == '<':
+		topLocal = get_local(topValue)
+		topNot = get_not_local(topValue)
+		isBinding = True
+	if bottomValue[0] == '<':
+		bottomLocal = get_local(bottomValue)
+		bottomNot = get_not_local(bottomValue)
+		isBinding = True
+	if (topValue == ':closure:' or bottomValue == ':closure:'
+			or topNot == ':closure:' or bottomNot == ':closure:'):
+		return False
+	if isBinding:
+		if (topLocal == bottomLocal and topNot == bottomNot):
+			return True
+		else:
+			return False
+	else:
+		if topValue == bottomValue:
+			return True
+		else:
+			return False
+
+def len_func(env):
+	topValue = env['stack'][0]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if topValue[0] == '"':
+		ret = len(topValue) - 2
+		ret = str(ret)
+		env['stack'].insert(0,ret)
+		return True
+	else:
+		return False
+
+def cat_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	if topValue[0] == '"' and bottomValue[0] == '"':
+		ret = bottomValue + topValue
+		ret = ret.replace('"','')
+		ret = '"'+ret+'"'
+		env['stack'].insert(0,ret)
+		return True
+	else:
+		return False
