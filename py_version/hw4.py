@@ -22,8 +22,13 @@ def load(inputFile):
 			if not contents:
 				fileIn.close()
 				break;
-			if contents != '\n':
+			if contents == '\n':
+				if buf[len(buf)-1] != ' ':
+					buf = buf + ' '
+			else:
 				buf = buf + contents
+	if buf[len(buf)-1] == ' ':
+		buf = buf[0:len(buf)-1]
 	return buf
 
 def repl():
@@ -124,7 +129,10 @@ def repl():
 						try:
 							inputFile = env['stack'][0]
 							inputFile = inputFile.replace('"','')
-							buf = buf[position:len(buf)]
+							if position == len(buf)-1:
+								buf = buf[position+1:len(buf)]
+							else:
+								buf = buf[position:len(buf)]
 							buf = load(inputFile)+' '+':true:'+buf
 							env['stack'].pop(0)
 							user_input = ''

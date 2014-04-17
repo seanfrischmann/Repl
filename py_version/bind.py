@@ -15,7 +15,7 @@ def bindFunc(user_input, env, active_env):
 		local = env['stack'][1]
 	elif (env['stack'][1])[0] == '<': 
 		local = primitives.get_local(env['stack'][1])
-		if not local.isalpha():
+		if not local[0].isalpha():
 			return False
 	else:
 		return False

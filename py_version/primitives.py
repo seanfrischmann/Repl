@@ -39,6 +39,7 @@ def get_not_local(value):
 		if value[i] == ',' and isBuild == False and isString == False:
 			i += 1
 			isBuild = True
+			continue
 		if isBuild:
 			ret = ret + value[i]
 		i += 1
@@ -177,7 +178,28 @@ def cat_func(env):
 		ret = bottomValue + topValue
 		ret = ret.replace('"','')
 		ret = '"'+ret+'"'
+		env['stack'].pop(0)
+		env['stack'].pop(0)
 		env['stack'].insert(0,ret)
 		return True
 	else:
 		return False
+
+def less_func(env):
+	topValue = env['stack'][0]
+	bottomValue = env['stack'][1]
+	if topValue[0] == '<':
+		topValue = get_not_local(topValue)
+	if bottomValue[0] == '<':
+		bottomValue = get_not_local(bottomValue)
+	if isinstance(int(bottomValue),int) and isinstance(int(topValue),int):
+		if int(bottomValue) < int(topValue):
+			env['stack'].insert(0,':true:')
+		else:
+			env['stack'].insert(0,':false:')
+		env['stack'].pop(1)
+		env['stack'].pop(1)
+		return True
+	else:
+		return False
+
