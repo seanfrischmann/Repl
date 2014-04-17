@@ -8,6 +8,7 @@
 import sys
 import evaluater
 import closure
+import primitives
 
 def print_list(stack):
 	for i, v in enumerate(stack):
@@ -38,7 +39,7 @@ def repl():
 	env['global']['bindings'] = dict()
 	env['global']['closures'] = list()
 	env['global']['binded closures'] = dict()
-	env['inactive links'] = list()
+	env['inactive'] = list()
 	mode = 'default'
 	buf = ''
 	isSpace = False
@@ -54,15 +55,17 @@ def repl():
 		if apply_count > 0:
 			if isNested:
 				isNested = False
-				env['inactive links'] = list()
-			buf = temp_buf[0]
-			temp_buf.pop(0)
-			position = temp_position[0]
-			temp_position.pop(0)
-			position += 1
+				env['inactive'] = list()
+			if len(temp_buf) != 0:
+				buf = temp_buf[0]
+				temp_buf.pop(0)
+				position = temp_position[0]
+				temp_position.pop(0)
+				position += 1
 			apply_count += -1
 			active_env += -1
-			env['active'].pop(0)
+			if len(env['active']) != 0:
+				env['active'].pop(0)
 		elif mode == 'default':
 			buf = input('repl> ')
 		else:
@@ -86,7 +89,10 @@ def repl():
 				user_input = user_input + buf[position]
 			if isSpace or position == len(buf)-1:
 				if user_input == 'apply':
-					if env['stack'][0] == ':closure:':
+					topValue = env['stack'][0]
+					if topValue[0] == '<':
+						topValue = primitives.get_not_local(topValue)
+					if topValue == ':closure:':
 						temp_buf.insert(0, buf)
 						temp_position.insert(0, position)
 						closureValue = env['global']['closures'][0]
