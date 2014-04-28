@@ -7,13 +7,6 @@ the interpreter we are building in class.
 
 ===========================================================================
 
-* Python version needs:
-
-                      --> Correct 'apply' functionality to incorporate
-                          current and global environments
-                      
-                      --> COmpatibility with nested functions
-                      
 * Python version has:
 
                       --> Names
@@ -27,3 +20,7 @@ the interpreter we are building in class.
                       --> Anonymous Functions
                       
                       --> bindings
+                      
+                      --> Apply Functionality to current and global environments
+                      
+                      --> compatibility with nested functions
